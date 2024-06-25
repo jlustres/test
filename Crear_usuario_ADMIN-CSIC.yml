@@ -1,25 +1,7 @@
 ---
-# Creacion admin-csic y gestion claves RSA
-# Creado por: Sistemas-Linux Miguel (Mayo 2021)
-# Version: 0.4
-# Ultima modificación: Miguel (30/11/2021)
-# V0.3 18/10/2021 Add rocky Linux como distribucion
-# V0.4 30/11/2021 Mod versiones distribution_file_variety
-#Creacion usuario ADMIN-CSIC
+#Creacion usuario ADMIN
 - name: USERADD
   hosts: all
-  remote_user: ansadmlinux
- 
-  vars:
-    my_secret: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          64386332376134373530366236623830653634323461303935663466383933643762303932393461
-          6665663630616163306430633034626565363031316332620a626135313933353230316433623235
-          61333835616332353636663739303737343731633433383061353630613661376161323164343434
-          6130636434366263650a623231643363323532633835653035656164313165666162376338343630
-          6431
-
- 
   tasks:
  
   - name: Groups add
@@ -27,43 +9,43 @@
       name: "{{ item }}"
       state: present
     loop:
-      - admin-csic
-      - sshcsic
+      - admin
+      - sshgroup
       - sshapp
 
   - name: User add Centos
     when: ansible_distribution_file_variety == "RedHat"
     user:
-      name: admin-csic
+      name: admin
       append: yes
       shell: /bin/bash
-      group: admin-csic
-      groups: wheel,sshcsic
-      password: "{{ my_secret }}"
+      group: admin
+      groups: wheel,sshgroup
+      password: 12345678 
 
   - name: User add Debian
     when: ansible_distribution_file_variety == "Debian"
     user:
-      name: admin-csic
+      name: admin
       append: yes
       shell: /bin/bash
-      group: admin-csic
-      groups: sudo,sshcsic
-      password: "{{ my_secret }}"
+      group: admin
+      groups: sudo,sshgroup
+      password: 12345678
 
   - name: Make directory
     file:
-      path: "/home/admin-csic/.ssh"
+      path: "/home/admin/.ssh"
       state: directory
       mode: '0700'
-      owner: admin-csic
-      group: admin-csic
+      owner: admin
+      group: admin
 
-  - name: Add sshkey admin-csic
+  - name: Add sshkey admin
     authorized_key:
-      user: admin-csic
+      user: admin
       state: present
-      key: "{{ lookup('file', 'admin-csic_id_rsa.pub') }}"
+      key: "{{ lookup('file', 'admin_id_rsa.pub') }}"
 
   - name: Crear file sudoers.d sudo
     when: ansible_distribution_file_variety == "Debian"
