@@ -1,0 +1,9 @@
+---
+# vars file for clavessh
+user:
+    - name: joselnav
+    - file: joselnav_pub
+
+user:
+    - name: antonio
+    - file: antonio_pub

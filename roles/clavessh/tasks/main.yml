@@ -1,0 +1,14 @@
+---
+# tasks file for clavessh
+
+#########################################
+#Claves RSA para los usuarios sistemas
+#########################################
+
+  - name: add sshkey {{ user.name }}
+    authorized_key:
+      user: admin-csic
+      state: present
+      key: "{{ lookup('file', "{{ user.file }}" ) }}"
+
+
