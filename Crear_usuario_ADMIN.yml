@@ -1,0 +1,100 @@
+---
+#Creacion usuario ADMIN
+- name: USERADD
+  hosts: all
+  tasks:
+ 
+  - name: Groups add
+    group:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - admin
+      - sshgroup
+      - sshapp
+
+  - name: User add Centos
+    when: ansible_distribution_file_variety == "RedHat"
+    user:
+      name: admin
+      append: yes
+      shell: /bin/bash
+      group: admin
+      groups: wheel,sshgroup
+      password: 12345678 
+
+  - name: User add Debian
+    when: ansible_distribution_file_variety == "Debian"
+    user:
+      name: admin
+      append: yes
+      shell: /bin/bash
+      group: admin
+      groups: sudo,sshgroup
+      password: 12345678
+
+  - name: Make directory
+    file:
+      path: "/home/admin/.ssh"
+      state: directory
+      mode: '0700'
+      owner: admin
+      group: admin
+
+  - name: Add sshkey admin
+    authorized_key:
+      user: admin
+      state: present
+      key: "{{ lookup('file', 'admin_id_rsa.pub') }}"
+
+  - name: Crear file sudoers.d sudo
+    when: ansible_distribution_file_variety == "Debian"
+    file:
+      path: "/etc/sudoers.d/sudo"
+      state: touch
+      mode: '0644'
+      owner: root
+      group: root
+
+  - name:  sudo sudoers.d contenido debian
+    when: ansible_distribution_file_variety == "Debian"
+    lineinfile:
+      destfile: "/etc/sudoers.d/sudo"
+      line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+  - name: Crear file sudoers.d wheel
+    when: ansible_distribution_file_variety == "RedHat"
+    file:
+      path: "/etc/sudoers.d/wheel"
+      state: touch
+      mode: '0644'
+      owner: root
+      group: root
+
+  - name:  sudo sudoers.d contenido centos
+    when: ansible_distribution_file_variety == "RedHat"
+
+    lineinfile:
+      state: present
+      destfile: "/etc/sudoers.d/wheel"
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+  - name:  sudo eliminar nopass centos
+    when: ansible_distribution_file_variety == "RedHat"
+    lineinfile:
+      state: absent
+      destfile: "/etc/sudoers"
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+      backup: yes
+
+  - name:  sudo eliminar nopass debian
+    when: ansible_distribution_file_variety == "Debian"
+    lineinfile:
+      state: absent
+      destfile: "/etc/sudoers"
+      line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+  roles:
+    - clavessh
+
+
