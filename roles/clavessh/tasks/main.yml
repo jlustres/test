@@ -9,7 +9,7 @@
     authorized_key:
       user: admin
       state: present
-      key: "{{ item.file }}"
+      key: "{{ lookup('file', item.file)}}"
     with_items: "{{ ssh_users }}"
 
 
