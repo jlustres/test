@@ -10,6 +10,6 @@
       user: admin
       state: present
       key: "{{ lookup('file', item.file) }}"
-      with_items: "{{ ssh_users }}"
+    with_items: "{{ ssh_users }}"
 
 
