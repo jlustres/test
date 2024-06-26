@@ -1,9 +1,7 @@
 ---
 # vars file for clavessh
-user:
+ssh_users:
     - name: joselnav
     - file: joselnav_pub
-
-user:
     - name: antonio
     - file: antonio_pub
