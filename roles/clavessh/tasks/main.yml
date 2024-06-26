@@ -5,10 +5,10 @@
 #Claves RSA 
 #########################################
 
-  - name: add sshkey {{ user.name }}
+  - name: add sshkey {{ item.name }}
     authorized_key:
       user: admin
       state: present
-      key: "{{ lookup('file', user.file) }}"
+      key: "{{ lookup('file', item.file) }}"
 
 
