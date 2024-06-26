@@ -1,6 +1,6 @@
 ---
 # vars file for clavessh
 ssh_users:
-  - { name: joselnav, file: joselnav_pub }
+  - { name: jlnavarro, file: jlnavarro_pub }
   - { name: antonio, file: antonio_pub }
 
