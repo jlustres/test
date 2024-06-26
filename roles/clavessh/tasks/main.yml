@@ -9,7 +9,7 @@
     authorized_key:
       user: admin
       state: present
-      key: "{{ role_path}}/files/item.file }}"
+      key: "{{ item.file }}"
     with_items: "{{ ssh_users }}"
 
 

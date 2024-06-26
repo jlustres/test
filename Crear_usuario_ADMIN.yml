@@ -94,7 +94,7 @@
       destfile: "/etc/sudoers"
       line: '%sudo ALL=(ALL) NOPASSWD: ALL'
 
-  roles:
-    - clavessh
+      #roles:
+      #- clavessh
 
 
