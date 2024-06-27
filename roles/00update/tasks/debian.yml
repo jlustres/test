@@ -1,6 +1,6 @@
 ---
 - name: apt-get clean
-  when: apt_clean
+  when: (apt_clean)
   command: apt-get clean warn=no
 
 - name: apt-get autoremove
