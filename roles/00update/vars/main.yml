@@ -1,0 +1,7 @@
+---
+# vars file for 00update
+vars:
+  restart_after_update: true
+  yum_clean_all: true
+  apt_clean: true
+  apt_autoremove: true

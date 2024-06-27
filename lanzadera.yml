@@ -1,0 +1,13 @@
+---
+# Lanza las configuraciones necesarias para un equipo recién instalado
+#
+- hosts: all
+  # nombre del grupo de los equipos a instalar
+  name: Ansible System Update
+  ##remote_user: ansadmlinux
+  become: yes
+  become_user: root
+
+  roles:
+    - 00update
+...
