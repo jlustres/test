@@ -1,9 +1,5 @@
 ---
 # tasks file for 00update
-- name: Muestra familia SO
-    debug:
-      msg: "S.O. {{ ansible_facts['os_family'] }}"
-
 - name: Actualiza Centos y RedHat
   import_tasks: centos_rhel.yml
   when: ansible_distribution_file_variety == "RedHat"
