@@ -6,7 +6,7 @@
     shell: /bin/bash
     group: admin
     groups: sudo,sshgroup
-    password: "12345678"
+    password: "{{ my_secret }}"
 
 - name: Crear file sudoers.d sudo
   file:
