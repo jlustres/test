@@ -1,0 +1,32 @@
+---
+- name: User admin Centos y RHEL
+  user:
+    name: admin
+    append: yes
+    shell: /bin/bash
+    group: admin
+    groups: wheel,sshgroup
+    password: "12345678"
+
+- name: Crear file sudoers.d wheel
+  file:
+    path: "/etc/sudoers.d/wheel"
+    state: touch
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: sudo sudoers.d contenido centos
+  lineinfile:
+    state: present
+    destfile: "/etc/sudoers.d/wheel"
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+- name: Config NOPASSWD sudoers
+  lineinfile:
+    state: absent
+    destfile: "/etc/sudoers"
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    backup: yes
+
+...

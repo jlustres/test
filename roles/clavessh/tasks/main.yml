@@ -1,15 +1,47 @@
 ---
-# tasks file for clavessh
+# tasks file for CreaUserAdminconRSA
+# Creacion usuario ADMIN
+- name: Groups add
+  group:
+    name: "{{ item }}"
+      state: present
+    loop:
+      - admin
+      - sshgroup
+      - sshapp
+
+- name: Make directory
+  file:
+    path: "/home/admin/.ssh"
+    state: directory
+    mode: '0700'
+    owner: admin
+    group: admin
+
+- name: Add sshkey admin
+  authorized_key:
+    user: admin
+    state: present
+    key: "{{ lookup('file', 'admin_id_rsa.pub') }}"
+
+- name: User add Centos
+  import_tasks: admin_centos_rhel.yml
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: User add Debian
+  import_tasks: admin_debian.yml
+  when: ansible_distribution_file_variety == "Debian"
+
 
 #########################################
 #Claves RSA 
 #########################################
 
-  - name: add sshkey "{{ item.name }}"
-    authorized_key:
-      user: admin
-      state: present
-      key: "{{ lookup('file', item.file)}}"
-    with_items: "{{ ssh_users }}"
+- name: add sshkey "{{ item.name }}"
+  authorized_key:
+    user: admin
+    state: present
+    key: "{{ lookup('file', item.file)}}"
+  with_items: "{{ ssh_users }}"
 
 

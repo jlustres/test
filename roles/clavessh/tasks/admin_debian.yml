@@ -1,0 +1,30 @@
+---
+- name: User admin Debian
+  user:
+    name: admin
+    append: yes
+    shell: /bin/bash
+    group: admin
+    groups: sudo,sshgroup
+    password: "12345678"
+
+- name: Crear file sudoers.d sudo
+  file:
+    path: "/etc/sudoers.d/sudo"
+    state: touch
+    mode: '0644'
+    owner: root
+    group: root
+
+- name:  sudo sudoers.d contenido debian
+  lineinfile:
+    destfile: "/etc/sudoers.d/sudo"
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+- name:  sudo eliminar nopass debian
+  lineinfile:
+    state: absent
+    destfile: "/etc/sudoers"
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+...
