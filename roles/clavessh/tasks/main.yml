@@ -5,10 +5,10 @@
   group:
     name: "{{ item }}"
     state: present
-    loop:
-      - admin
-      - sshgroup
-      - sshapp
+  loop:
+    - admin
+    - sshgroup
+    - sshapp
 
 - name: Make directory
   file:
