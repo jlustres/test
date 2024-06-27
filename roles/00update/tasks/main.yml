@@ -1,6 +1,5 @@
 ---
 # tasks file for 00update
-pre_tasks:
 - name: Muestra familia SO
     debug:
       msg: "S.O. {{ ansible_facts['os_family'] }}"
