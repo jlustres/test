@@ -1,9 +1,9 @@
 ---
 - name: Clean Yum cache
-    when: yum_clean_all
-    command: yum clean all warn=no
+  when: yum_clean_all
+  command: yum clean all warn=no
 - name: EL System Update
-    yum: name=* state=latest update_cache=yes
-    environment:
-      ACCEPT_EULA: 'y'
+  yum: name=* state=latest update_cache=yes
+  environment:
+    ACCEPT_EULA: 'y'
 ...

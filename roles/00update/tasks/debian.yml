@@ -1,13 +1,13 @@
 ---
 - name: apt-get clean
-    when: apt_clean
-    command: apt-get clean warn=no
+  when: apt_clean
+  command: apt-get clean warn=no
 
 - name: apt-get autoremove
-    when: apt_autoremove
-    apt: autoremove=yes
+  when: apt_autoremove
+  apt: autoremove=yes
 
 - name: apt-get dist-upgrade
-    apt: upgrade=dist update_cache=yes
+  apt: upgrade=dist update_cache=yes
 
 ...
