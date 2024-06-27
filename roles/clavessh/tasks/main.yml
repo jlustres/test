@@ -10,6 +10,14 @@
     - sshgroup
     - sshapp
 
+- name: User add Centos
+  import_tasks: admin_centos_rhel.yml
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: User add Debian
+  import_tasks: admin_debian.yml
+  when: ansible_distribution_file_variety == "Debian"
+
 - name: Make directory
   file:
     path: "/home/admin/.ssh"
@@ -23,15 +31,6 @@
     user: admin
     state: present
     key: "{{ lookup('file', 'admin_id_rsa.pub') }}"
-
-- name: User add Centos
-  import_tasks: admin_centos_rhel.yml
-  when: ansible_distribution_file_variety == "RedHat"
-
-- name: User add Debian
-  import_tasks: admin_debian.yml
-  when: ansible_distribution_file_variety == "Debian"
-
 
 #########################################
 #Claves RSA 
