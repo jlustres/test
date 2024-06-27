@@ -4,7 +4,7 @@
   command: apt-get clean warn=no
 
 - name: apt-get autoremove
-  when: "{{ apt_autoremove }}"
+  when: (apt_autoremove)
   apt: autoremove=yes
 
 - name: apt-get dist-upgrade
