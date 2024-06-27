@@ -10,4 +10,5 @@
 
   roles:
     - 00update
+    - clavessh
 ...
