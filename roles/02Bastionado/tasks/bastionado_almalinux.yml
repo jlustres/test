@@ -1,0 +1,14 @@
+---
+- name: SSH bastionado sshd_config PrintMotd para AlmaLinux
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: '^PrintMotd'
+    line: 'PrintMotd no'
+  register: result
+
+- name: Restart sshd Alamlinux
+  when: result is changed
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+...

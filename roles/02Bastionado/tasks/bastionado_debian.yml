@@ -1,0 +1,33 @@
+---
+- name: Carga debian grupo SO
+    set_fact:
+      gruposo: "sudo"
+
+- name: Crear file sudoers.d sudo
+  file:
+    path: "/etc/sudoers.d/sudo"
+    state: touch
+    mode: '0644'
+    owner: root
+    group: root
+
+- name:  sudo sudoers.d contenido debian
+  lineinfile:
+    destfile: "/etc/sudoers.d/sudo"
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+
+- name: SSH bastionado sshd_config PrintMotd debian
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: '^PrintMotd'
+    line: 'PrintMotd no'
+  register: result
+
+- name: Restart sshd Debian
+  when: result is changed
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+...
+

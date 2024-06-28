@@ -11,4 +11,7 @@
   roles:
     - 00update
     - clavessh
+    - 02Bastionado
+
 ...
+

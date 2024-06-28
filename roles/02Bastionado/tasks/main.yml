@@ -1,2 +1,107 @@
 ---
 # tasks file for 02Bastionado
+---
+#
+- name: Groups Check
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - sshcontoso
+    - admin
+    - sshapp
+
+- name: Check admin user
+  ansible.builtin.user:
+    name: admin
+    group: admin
+    groups: sshcontoso,{{ gruposo }}
+
+- debug:
+    msg: "La siguiente task puede mostrar error si no encuentra usuario. Si continua tras el error es normal"
+
+- name: Check user ansadmhorizontales
+  changed_when: true
+  ansible.builtin.command: "grep ansadmhorizontales -q /etc/passwd"
+  ignore_errors: true
+  register: userexist
+
+- name: Add horizontales to group
+  when: userexist is succeeded
+  ansible.builtin.user:
+    name: ansadmhorizontales
+    group: ansadmhorizontales
+    groups: sshcontoso,{{ gruposo }}
+    append: yes
+
+- debug:
+    msg: "La siguiente task puede mostrar error si no encuentra usuario. Si continua tras el error es normal"
+
+- name: Check user ansadmbbdd
+  changed_when: true
+  ansible.builtin.command: "grep ansadmbbdd -q /etc/passwd"
+  ignore_errors: true
+  register: userexistbd
+
+- name: Add ansadmbbdd to group
+  when: userexistbd is succeeded
+  ansible.builtin.user:
+    name: ansadmbbdd
+    group: ansadmbbdd
+    groups: sshcontoso,{{ gruposo }}
+    append: yes
+
+- name: Check ansadmlinux groups
+  ansible.builtin.user:
+    name: ansadmlinux
+    group: ansadmlinux
+    groups: sshcontoso,{{ gruposo }}
+
+
+- name:  SSH bastionado limits.conf
+  ansible.builtin.lineinfile:
+    path: "/etc/security/limits.conf"
+    regexp: '^admin hard maxlogins'
+    line: 'admin hard maxlogins 8'
+
+- name: SSH bastionado sshd_config Comun
+  ansible.builtin.lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^AllowGroups', line: 'AllowGroups sshcontoso sshapp' }
+    - { regexp: '^AllowUser', line: '#AllowUser' }
+    - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication no' }
+    - { regexp: '^PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+    - { regexp: '^MaxAuthTries', line: 'MaxAuthTries 3' }
+    - { regexp: '^PrintLastLog', line: 'PrintLastLog yes' }
+    - { regexp: '^ClientAliveInterval', line: 'ClientAliveInterval 1800' }
+    - { regexp: '^ClientAliveCountMax', line: 'ClientAliveCountMax 3' }
+    - { regexp: '^MaxSessions', line: 'MaxSessions 10' }
+    - { regexp: '^LogLevel', line: 'LogLevel VERBOSE' }
+  register: result
+
+- name: Restart sshd comun
+  when: result is changed
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: Carga debian grupo
+  import_tasks: bastionado_debian.yml
+  when: ansible_distribution_file_variety == "Debian"
+
+- name: Carga centos grupo
+  import_tasks: bastionado_rhel.yml
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: SSH bastionado sshd_config PrintMotd para AlmaLinux
+  import_tasks: bastionado_almalinux.yml
+  when: ansible_os_family|lower == "almalinux"
+
+
+
+
+

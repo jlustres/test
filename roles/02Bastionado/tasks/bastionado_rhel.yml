@@ -1,0 +1,40 @@
+---
+- name: Carga centos grupo OS
+    set_fact:
+      gruposo: "wheel"
+
+- name: Crear file sudoers.d wheel
+  file:
+    path: "/etc/sudoers.d/wheel"
+    state: touch
+    mode: '0644'
+    owner: root
+    group: root
+
+- name:  sudo sudoers.d contenido centos
+  lineinfile:
+    state: present
+    destfile: "/etc/sudoers.d/wheel"
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+- name: SSH bastionado sshd_config PrintMotd centos
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: '^PrintMotd'
+    line: 'PrintMotd yes'
+  register: result
+
+- name: Restart sshd Rhel
+  when: result is changed
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+ - name: SSH bastionado SUDOERS eliminar requiretty Centos6
+   when: ansible_distribution_major_version == "6"
+   ansible.builtin.lineinfile:
+    path: "/etc/sudoers"
+    regexp: '^Defaults    requiretty'
+    line: '#Defaults    requiretty'
+    backup: yes
+...
