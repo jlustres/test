@@ -66,6 +66,8 @@
     name: ansadmlinux
     group: ansadmlinux
     groups: sshcontoso,{{ gruposo }}
+  # QUITAR ESTE IGNORE!!!!
+  ignore_errors: true
 
 
 - name:  SSH bastionado limits.conf
