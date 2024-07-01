@@ -1,6 +1,5 @@
 ---
 # tasks file for 02Bastionado
----
 #
 - name: Groups Check
   ansible.builtin.group:
@@ -107,7 +106,7 @@
   ansible.builtin.service:
     name: sshd
     state: restarted
-
+...
 
 
 
