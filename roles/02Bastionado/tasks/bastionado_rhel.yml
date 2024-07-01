@@ -1,7 +1,7 @@
 ---
 - name: Carga centos grupo OS
-    set_fact:
-      gruposo: "wheel"
+  set_fact:
+    gruposo: "wheel"
 
 - name: Crear file sudoers.d wheel
   file:
