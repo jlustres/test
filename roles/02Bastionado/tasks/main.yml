@@ -11,6 +11,18 @@
     - admin
     - sshapp
 
+- name: Carga debian grupo
+  import_tasks: bastionado_debian.yml
+  when: ansible_distribution_file_variety == "Debian"
+
+- name: Carga centos grupo
+  import_tasks: bastionado_rhel.yml
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: SSH bastionado sshd_config PrintMotd para AlmaLinux
+  import_tasks: bastionado_almalinux.yml
+  when: ansible_os_family|lower == "almalinux"
+
 - name: Check admin user
   ansible.builtin.user:
     name: admin
@@ -64,6 +76,13 @@
     regexp: '^admin hard maxlogins'
     line: 'admin hard maxlogins 8'
 
+- name: Ansible copy file to remote server
+  copy:
+    src: motd
+    dest: /etc/motd
+    owner: root
+    group: root
+
 - name: SSH bastionado sshd_config Comun
   ansible.builtin.lineinfile:
     path: "/etc/ssh/sshd_config"
@@ -89,17 +108,7 @@
     name: sshd
     state: restarted
 
-- name: Carga debian grupo
-  import_tasks: bastionado_debian.yml
-  when: ansible_distribution_file_variety == "Debian"
 
-- name: Carga centos grupo
-  import_tasks: bastionado_rhel.yml
-  when: ansible_distribution_file_variety == "RedHat"
-
-- name: SSH bastionado sshd_config PrintMotd para AlmaLinux
-  import_tasks: bastionado_almalinux.yml
-  when: ansible_os_family|lower == "almalinux"
 
 
 
