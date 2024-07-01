@@ -30,9 +30,9 @@
     name: sshd
     state: restarted
 
- - name: SSH bastionado SUDOERS eliminar requiretty Centos6
-   when: ansible_distribution_major_version == "6"
-   ansible.builtin.lineinfile:
+- name: SSH bastionado SUDOERS eliminar requiretty Centos6
+  when: ansible_distribution_major_version == "6"
+    ansible.builtin.lineinfile:
     path: "/etc/sudoers"
     regexp: '^Defaults    requiretty'
     line: '#Defaults    requiretty'
