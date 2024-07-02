@@ -1,0 +1,26 @@
+---
+# MariaDB y Mysql
+- name: Create file zabbix.d/user_parameter_v6_mysql.conf
+  file:
+    path: "/etc/zabbix/zabbix_agentd.d/userparameter_v6_mysql.conf"
+    state: touch
+    mode: '0644'
+    owner: zabbix
+    group: zabbix
+
+- name:  Add userparameter_mariadb
+  lineinfile:
+    state: present
+    destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_v6_mysql.conf"
+    line: '{{ item }}'
+    owner: zabbix
+    group: zabbix
+    create: true
+  with_items:
+    - "#Parametros para template mysql en zabbix v6"
+    - "UserParameter=mysql.ping[*], mysqladmin -h'$1' -P'$2' ping"
+    - "UserParameter=mysql.get_status_variables[*], mysql -h'$1' -P'$2' -sNX -e 'show global status'"
+    - "UserParameter=mysql.db.discovery[*], mysql -h'$1' -P'$2' -sN -e 'show databases'"
+    - "UserParameter=mysql.dbsize[*], mysql -h'$1' -P'$2' -sN -e 'SELECT COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH),0) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$3''"
+    - "UserParameter=mysql.replication.discovery[*], mysql -h'$1' -P'$2' -sNX -e 'show slave status'"
+    - "UserParameter=mysql.slave_status[*], mysql -h'$1' -P'$2' -sNX -e 'show slave status'"

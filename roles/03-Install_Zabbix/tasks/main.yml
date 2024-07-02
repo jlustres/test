@@ -1,0 +1,126 @@
+---
+# tasks file for 03-Install_Zabbix
+# Activamos package_facts para discriminar ntp o chrony en los paquetes instalados
+- name: "Gather the package facts"
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: "Set short version name"
+  set_fact:
+    zabbix_short_version: "{{ zabbix_version | regex_replace('\\.', '') }}"
+    zabbix_underscore_version: "{{ zabbix_version | regex_replace('\\.', '_') }}"
+
+- name: Usamos FQDN del servidor Zabbix si usamos gestion red FWLB
+  when: (sub_entorno == "FWLB") or (sub_entorno == "Balanceadores")
+  set_fact:
+    zabbix_server_fwlb: "{{ zabbix_server }}.{{ entorno|lower }}.sistemas.contoso.es"
+
+# Requisitos para la instalacion
+# Debian gnupg para inslacion de firmas
+
+- name: "Debian dependencias Zabbix"
+  import_tasks: debian-zabbix.yml
+  when: ansible_distribution_file_variety == "Debian"
+
+#Sistemas RedHat/CentOS/AlmaLinux/RockyLinux/ScientificLinux
+
+- name: Actualizamos ca-certificates a la ultima version
+  import_tasks: rhel-zabbix.yml
+  when: ansible_distribution_file_variety == "RedHat"
+
+
+#Configuracion del agente. TODAS las distros.
+
+# Modificamos el Server=zbbxproxy por variable monitor3 para las actualizaciones
+- name: Modify zabbix-agent-conf Server
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^Server=monitor2.mgmt$'
+    replace: "Server={{ zabbix_server_fwlb | default(zabbix_server) }}"
+  register: result
+
+- name: Modify zabbix-agent-conf ServerActive
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^ServerActive=monitor2.mgmt$'
+    replace: "ServerActive={{ zabbix_server_fwlb | default(zabbix_server) }}"
+  register: result
+
+# Modificamos el Server=zbbxproxy por variable monitor3 para las actualizaciones
+- name: Modify zabbix-agent-conf Server
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^Server=zbbxproxy31.mgmt$'
+    replace: "Server={{ zabbix_server_fwlb | default(zabbix_server) }}"
+  register: result
+
+- name: Modify zabbix-agent-conf ServerActive
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^ServerActive=zbbxproxy31.mgmt$'
+    replace: "ServerActive={{ zabbix_server_fwlb | default(zabbix_server) }}"
+  register: result
+
+# En instalaciones nuevas el Server y ServerActive esta en 127.0.0.1
+- name: Modify zabbix-agent-conf Server
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^Server=127.0.0.1$'
+    replace: "Server={{ zabbix_server_fwlb | default(zabbix_server) }}"
+  register: result
+
+- name: Modify zabbix-agent-conf ServerActive
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^ServerActive=127.0.0.1$'
+    replace: "ServerActive={{ zabbix_server_fwlb | default(zabbix_server) }}"
+  register: result
+
+- name: Modify zabbix-agent-conf Hostname
+  replace:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: '^Hostname=Zabbix server$'
+    replace: 'Hostname={{ inventory_hostname }}'
+  register: result
+
+- name: Modify zabbix-agent-conf Timeout
+  lineinfile:
+    path: /etc/zabbix/zabbix_agentd.conf
+    regexp: 'Timeout'
+    insertafter: # Timeout=3"
+    line: 'Timeout=30'
+  register: result
+
+# Creamos los archivos userparameter  para chrony en caso de estar instalado
+- name: Creamos los archivos userparameter para chrony en caso de estar instalado
+  import_tasks: chrony.yml
+  when: "'chrony' in ansible_facts.packages"
+
+
+# Creamos los archivos de userparameters para ntp en caso de estar instalado
+- name: Creamos los archivos de userparameters para ntp en caso de estar instalado
+  import_tasks: ntp.yml
+  when: "'ntp' in ansible_facts.packages"
+
+# Creamos los archivos de userparameters para mysql en caso de estar instalado
+- name: Creamos los archivos de userparameters para mysql en caso de estar instalado
+  import_tasks: my_maria.yml
+  when: "'MariaDB-server' in ansible_facts.packages or 'mariadb-server' in ansible_facts.packages"
+
+- name: Configuración si bind está instalado
+  import_tasks: bind.yml
+  when: "'bind' in ansible_facts.packages"
+
+- name: Restart zabbix-agent
+  when: result is changed
+  ansible.builtin.service:
+    name: zabbix-agent
+    state: restarted
+
+- name: Enable and start zabbix-agent service
+  ansible.builtin.service:
+    name: zabbix-agent
+    enabled: true
+    state: started
+
+

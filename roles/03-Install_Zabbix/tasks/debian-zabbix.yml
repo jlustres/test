@@ -1,0 +1,44 @@
+---
+# Debian dependencias Zabbix
+#
+- name: "Debian | Install gpg key"
+  ansible.builtin.apt:
+    name: gnupg
+      state: present
+      update_cache: yes
+
+#Sistemas Debian/Ubuntu
+- name: "Debian | get gpg key"
+  apt_key:
+    url: "{{ base_url }}/zabbix-official-repo.key"
+    state: present
+
+- name: Create zabbix repo deb
+  apt_repository:
+    repo: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
+    state: present
+    update_cache: true
+
+- name: Install zabbix-agent package deb
+  apt:
+    update_cache: yes
+    name: zabbix-agent
+    state: latest
+
+# Creamos los archivos userparameter para debian ubuntu - timedatectl
+
+- name: Create file zabbix.d/userparameter_timedate.conf
+  file:
+    path: "/etc/zabbix/zabbix_agentd.d/userparameter_timedate.conf"
+    state: touch
+    mode: '0644'
+    owner: zabbix
+    group: zabbix
+
+- name:  Add userparameter_timedatectl Debian
+  lineinfile:
+    state: present
+    destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_timedate.conf"
+    line: 'UserParameter=tdctl.response,timedatectl timesync-status'
+    create: true
+...

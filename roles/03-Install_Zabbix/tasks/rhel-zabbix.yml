@@ -1,0 +1,95 @@
+---
+# Dependencias Zabbix para RHEL
+#
+- name: Actualizamos ca-certificates a la ultima version
+  yum:
+    name: ca-certificates
+    state: latest
+
+#EL 9 no soporta ya el algoritmo SHA1 y necesita una clave distinta
+
+- name: Import official zabbix repo key for EL 9
+  when: ansible_distribution_major_version == "9"
+  rpm_key:
+    state: present
+    key: "{{ base_url }}/RPM-GPG-KEY-ZABBIX-08EFA7DD"
+
+- name: Import official zabbix repo key
+  when: ansible_distribution_major_version != "9"
+  rpm_key:
+    state: present
+    key: "{{ base_url }}/zabbix-official-repo.key"
+
+- name: Create zabbix rhel repo
+  yum: name="{{ base_url }}/enlaces_release/zabbix-release-{{ zabbix_version }}.el{{ ansible_distribution_major_version }}.noarch.rpm" disable_gpg_check="yes"
+
+- name: Modify zabbix rhel repo baseurl
+  replace:
+   path: /etc/yum.repos.d/zabbix.repo
+   after: '\[zabbix]'
+   before: '\[zabbix-'
+   regexp: 'repo.zabbix.com'
+   replace: 'slmirror.contoso.es/extra'
+
+- name: Disable zabbix rhel repo non-supported
+  ini_file:
+    path: /etc/yum.repos.d/zabbix.repo
+    section: zabbix-non-supported
+    option: enabled
+    value: "0"
+
+- name: Check existence of zabbix agent2 plugins repo file
+  stat:
+    path: "/etc/yum.repos.d/zabbix-agent2-plugins.repo"
+  register: zabbix_agent2_plugins_repo_file
+
+- name: Disable zabbix agent2 plugins repo
+  when: zabbix_agent2_plugins_repo_file
+  ini_file:
+    path: /etc/yum.repos.d/zabbix-agent2-plugins.repo
+    section: zabbix-agent2-plugins
+    option: enabled
+    value: "0"
+
+# Excluimos los paquetes zabbix* del repo de EPEL
+- name: Check existence of EPEL repo file
+  stat:
+    path: "/etc/yum.repos.d/epel.repo"
+  register: epel_repo_file
+
+- name: Exclude zabbix packages from EPEL repo
+  when: epel_repo_file.stat.exists
+  ini_file:
+    path: /etc/yum.repos.d/epel.repo
+    section: epel
+    state: present
+    option: exclude
+    value: "zabbix*"
+
+#CentOS 7 tiene problemas con la llave erronea de RPM-GPG-KEY-ZABBIX
+- name: Delete wrong zabbix repo key from RPM keyring
+  when: ansible_distribution_major_version == "7"
+  rpm_key:
+    state: absent
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX-A14FE591
+
+- name: Import Correct zabbix repo key for el7
+  when: ansible_distribution_major_version == "7"
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-ZABBIX
+
+#Instalamos el zabbix-agent (rhel)
+- name: Install zabbix-agent package rhel
+  yum:
+    name: zabbix-agent
+    state: latest
+
+#Apertura del puerto en el cortafuegos local
+#Sistemas RedHat/CentOS/AlmaLinux/RockyLinux/ScientificLinux
+- name: Permitimos trafico entrante desde servidor Zabbix
+  firewalld:
+    service: zabbix-agent
+    immediate: yes
+    permanent: yes
+    state: enabled

@@ -1,0 +1,33 @@
+---
+# Config bind
+- name:  Add userparameter_bind
+  lineinfile:
+    state: present
+    destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_bind.conf"
+    line: '{{ item }}'
+    owner: zabbix
+    group: zabbix
+    create: true
+  with_items:
+    - "#Parametros para template bind DNS en zabbix v6"
+    - "UserParameter=bind.discoverzones,/usr/local/bin/bind-stats.py discoverzones"
+    - "UserParameter=bind.json,/usr/local/bin/bind-stats.py json"
+    - "UserParameter=bind.jsonzone[*],/usr/local/bin/bind-stats.py jsonzone -z $1"
+    - "UserParameter=bind.counter[*],/usr/local/bin/bind-stats.py counter -c $1"
+    - "UserParameter=bind.zonecounter[*],/usr/local/bin/bind-stats.py zonecounter -z $1 -c $2"
+    - "UserParameter=bind.zonemaintenancecounter[*],/usr/local/bin/bind-stats.py zonemaintenancecounter -c $1"
+    - "UserParameter=bind.resolvercounter[*],/usr/local/bin/bind-stats.py resolvercounter -c $1"
+    - "UserParameter=bind.socketcounter[*],/usr/local/bin/bind-stats.py socketcounter -c $1"
+    - "UserParameter=bind.incounter[*],/usr/local/bin/bind-stats.py incounter -c $1"
+    - "UserParameter=bind.outcounter[*],/usr/local/bin/bind-stats.py outcounter -c $1"
+    - "UserParameter=bind.memory[*],/usr/local/bin/bind-stats.py memory -c $1"
+    - "UserParameter=bind.cache[*],/usr/local/bin/bind-stats.py cache -c $1"
+
+#Copiamos archivo necesario por userparameters BIND en el /usr/local/bin
+- name: Ansible copy bind-stats.py file
+  copy:
+    src: bind-stats.py
+    dest: /usr/local/bin/bind-stats.py
+    owner: zabbix
+    group: zabbix
+    mode: 0755

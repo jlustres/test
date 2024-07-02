@@ -1,0 +1,20 @@
+---
+# Config ntp
+- name: Create file zabbix.d/userparameter_ntp.conf
+  file:
+    path: "/etc/zabbix/zabbix_agentd.d/userparameter_ntp.conf"
+    state: touch
+    mode: '0644'
+    owner: zabbix
+    group: zabbix
+
+- name:  Add userparameter_ntp
+  lineinfile:
+    state: present
+    destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_ntp.conf"
+    line: '{{ item }}'
+    create: true
+  with_items:
+    - "UserParameter=ntp.response,ntpq -p"
+    - "UserParameter=ntp.ntpdate,ntpdate -p 1 -q ntp1.mgmt | grep -oP '(?<=offset ).*?(?= sec)'"
+    - "UserParameter={{ value1 }}"

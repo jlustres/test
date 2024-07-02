@@ -1,0 +1,16 @@
+---
+# Config Chrony
+- name: Create file zabbix.d/userparameter_chrony.conf
+  file:
+    path: "/etc/zabbix/zabbix_agentd.d/userparameter_chrony.conf"
+    state: touch
+    mode: '0644'
+    owner: zabbix
+    group: zabbix
+
+- name:  Add userparameter_chrony
+  lineinfile:
+    state: present
+    destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_chrony.conf"
+    line: 'UserParameter=chrtrack,chronyc tracking'
+    create: true

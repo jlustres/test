@@ -1,0 +1,9 @@
+---
+# vars file for 03-Install_Zabbix
+zabbix_version: "4.0"
+base_url: "http://slmirror.contoso.es/extra/zabbix"
+entorno: "SGAI-PRO"
+sub_entorno: "Corp"
+zabbix_server: "monitor2.mgmt"
+value1: ntp.server,ntpq -p|grep \* |awk '{print$1}'|sed s/*//
+
