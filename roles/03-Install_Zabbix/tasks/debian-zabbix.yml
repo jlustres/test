@@ -4,8 +4,8 @@
 - name: "Debian | Install gpg key"
   ansible.builtin.apt:
     name: gnupg
-      state: present
-      update_cache: yes
+    state: present
+    update_cache: yes
 
 #Sistemas Debian/Ubuntu
 - name: "Debian | get gpg key"
