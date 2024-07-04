@@ -32,9 +32,7 @@
     name: zabbix-agent
     state: latest
 
-
 # Creamos los archivos userparameter para debian ubuntu - timedatectl
-
 - name: Create file zabbix.d/userpar#ameter_timedate.conf
   file:
     path: "/etc/zabbix/zabbix_agentd.d/userparameter_timedate.conf"
@@ -42,7 +40,6 @@
     mode: '0644'
     owner: zabbix
     group: zabbix
-  ignore_errors: true
 
 - name:  Add userparameter_timedatectl Debian
   lineinfile:
@@ -50,5 +47,4 @@
     destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_timedate.conf"
     line: 'UserParameter=tdctl.response,timedatectl timesync-status'
     create: true
-  ignore_errors: true
-...
+ ...
