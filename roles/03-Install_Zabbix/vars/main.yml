@@ -1,7 +1,8 @@
 ---
 # vars file for 03-Install_Zabbix
 zabbix_version: "4.0"
-base_url: "http://slmirror.contoso.es/extra/zabbix"
+##base_url: "http://slmirror.contoso.es/extra/zabbix"
+base_url: "https://repo.zabbix.com"
 entorno: "SGAI-PRO"
 sub_entorno: "Corp"
 zabbix_server: "monitor2.mgmt"
