@@ -25,11 +25,13 @@
 #  copy:
 #    dest: "/tmp/kk"
 #    content: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
+
 - name: Install zabbix-agent package deb
   apt:
     update_cache: yes
     name: zabbix-agent
     state: latest
+
 
 # Creamos los archivos userparameter para debian ubuntu - timedatectl
 
@@ -40,6 +42,7 @@
     mode: '0644'
     owner: zabbix
     group: zabbix
+  ignore_errors: true
 
 - name:  Add userparameter_timedatectl Debian
   lineinfile:
@@ -47,4 +50,5 @@
     destfile: "/etc/zabbix/zabbix_agentd.d/userparameter_timedate.conf"
     line: 'UserParameter=tdctl.response,timedatectl timesync-status'
     create: true
+  ignore_errors: true
 ...
