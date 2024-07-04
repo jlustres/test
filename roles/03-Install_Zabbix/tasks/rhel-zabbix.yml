@@ -13,12 +13,14 @@
   rpm_key:
     state: present
     key: "{{ base_url }}/RPM-GPG-KEY-ZABBIX-08EFA7DD"
+  ignore_errors: true
 
 - name: Import official zabbix repo key
   when: ansible_distribution_major_version != "9"
   rpm_key:
     state: present
     key: "{{ base_url }}/zabbix-official-repo.key"
+  ignore_errors: true
 
 - name: Create zabbix rhel repo
   yum: name="{{ base_url }}/enlaces_release/zabbix-release-{{ zabbix_version }}.el{{ ansible_distribution_major_version }}.noarch.rpm" disable_gpg_check="yes"

@@ -12,6 +12,7 @@
   apt_key:
     url: "{{ base_url }}/zabbix-official-repo.key"
     state: present
+  ignore_errors: true
 
 - name: Create zabbix repo deb
   apt_repository:
