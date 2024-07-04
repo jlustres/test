@@ -14,16 +14,17 @@
     state: present
   ignore_errors: true
 
-#- name: Create zabbix repo deb
-#  apt_repository:
-#    repo: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
-#    state: present
-#    update_cache: true
 - name: Create zabbix repo deb
-  copy:
-    dest: "/tmp/kk"
-    content: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
+  apt_repository:
+    repo: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
+    state: present
+    update_cache: true
+  ignore_errors: true
 
+#- name: Create zabbix repo deb
+#  copy:
+#    dest: "/tmp/kk"
+#    content: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
 - name: Install zabbix-agent package deb
   apt:
     update_cache: yes
@@ -32,7 +33,7 @@
 
 # Creamos los archivos userparameter para debian ubuntu - timedatectl
 
-- name: Create file zabbix.d/userparameter_timedate.conf
+- name: Create file zabbix.d/userpar#ameter_timedate.conf
   file:
     path: "/etc/zabbix/zabbix_agentd.d/userparameter_timedate.conf"
     state: touch
