@@ -20,9 +20,8 @@
 #    state: present
 #    update_cache: true
 - name: Create zabbix repo deb
-  file:
-    path: "/tmp/kk"
-    state: file
+  copy:
+    dest: "/tmp/kk"
     content: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
 
 - name: Install zabbix-agent package deb
