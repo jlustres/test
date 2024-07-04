@@ -14,11 +14,16 @@
     state: present
   ignore_errors: true
 
+#- name: Create zabbix repo deb
+#  apt_repository:
+#    repo: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
+#    state: present
+#    update_cache: true
 - name: Create zabbix repo deb
-  apt_repository:
-    repo: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
-    state: present
-    update_cache: true
+  file:
+    copy:
+      dest: "/tmp/kk"
+      content: "deb {{ base_url }}/{{ zabbix_version }}/{{ ansible_lsb.id|lower }} {{ ansible_lsb.codename|lower }} main"
 
 - name: Install zabbix-agent package deb
   apt:
